@@ -1,0 +1,9 @@
+# Python's auto-generated cache — junk, never commit
+__pycache__/
+
+# Secrets and local config — must never reach the repo (Task 4!)
+.env
+
+# Local virtual environment folder, if we make one later
+venv/
+.venv/
