@@ -7,3 +7,5 @@ __pycache__/
 # Local virtual environment folder, if we make one later
 venv/
 .venv/
+
+.dockerignore
