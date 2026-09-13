@@ -9,3 +9,9 @@ venv/
 .venv/
 
 .dockerignore
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
