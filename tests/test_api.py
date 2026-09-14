@@ -26,6 +26,7 @@ def test_unknown_code_returns_404():
 
 import random
 
+
 def test_flaky_example_fixed():
     # FIXED: was flaky because it depended on random.random().
     # A good test is deterministic — same result every time.
