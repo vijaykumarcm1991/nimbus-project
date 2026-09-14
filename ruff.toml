@@ -1,0 +1,6 @@
+# Ruff configuration for Nimbus
+
+[lint]
+# BLE001: we intentionally use broad exception handling in the DB-retry
+# loop and healthcheck, where catching everything is the desired behavior.
+ignore = ["BLE001"]

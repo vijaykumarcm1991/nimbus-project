@@ -1,0 +1,49 @@
+name: CI
+
+# When should this run?
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Get our code onto the runner
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      # 2. Install Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # 3. Install the linter and test tools
+      - name: Install tools
+        run: pip install ruff pytest httpx
+
+      # 4. Lint the code (fails the build on lint errors)
+      - name: Lint with ruff
+        run: ruff check .
+
+      # 5. Start the full stack with Docker Compose
+      - name: Start the app stack
+        run: docker compose up -d --build
+
+      # 6. Wait for the app to be healthy, then run tests
+      - name: Run integration tests
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/health; then break; fi
+            echo "Waiting for app..."; sleep 2
+          done
+          pytest -v
+
+      # 7. Always clean up, even if tests failed
+      - name: Tear down
+        if: always()
+        run: docker compose down

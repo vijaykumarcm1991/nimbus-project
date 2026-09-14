@@ -1,9 +1,12 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+import os
+import time
+import uuid
 from contextlib import asynccontextmanager
-import os, time, uuid
+
 import psycopg
 import redis
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 # Config comes from the environment — never hardcoded (Task 4 discipline)
 DATABASE_URL = os.environ["DATABASE_URL"]
