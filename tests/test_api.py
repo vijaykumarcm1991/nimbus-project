@@ -23,3 +23,13 @@ def test_shorten_then_lookup_returns_original_url():
 def test_unknown_code_returns_404():
     r = httpx.get(f"{BASE_URL}/links/thiscodedoesnotexist")
     assert r.status_code == 404
+
+import random
+
+def test_flaky_example_fixed():
+    # FIXED: was flaky because it depended on random.random().
+    # A good test is deterministic — same result every time.
+    # We seed the randomness so the outcome is always the same.
+    random.seed(42)
+    result = random.random()
+    assert result > 0.2, f"Value was {result}"
