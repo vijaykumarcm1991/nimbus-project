@@ -32,6 +32,12 @@ jobs:
 
       # 5. Start the full stack with Docker Compose
       - name: Start the app stack
+        env:
+          POSTGRES_USER: nimbus
+          POSTGRES_PASSWORD: ci_test_password
+          POSTGRES_DB: nimbus_db
+          DATABASE_URL: postgresql://nimbus:ci_test_password@db:5432/nimbus_db
+          REDIS_URL: redis://cache:6379
         run: docker compose up -d --build
 
       # 6. Wait for the app to be healthy, then run tests

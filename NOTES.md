@@ -94,3 +94,13 @@ Secrets are kept out of the repo and out of image layers at every stage:
 - Apply least-privilege IAM roles for each component instead of broad
   credentials.
 - Remove the fallback password default from compose entirely.
+
+## CI secrets handling
+
+CI can't read the local `.env` (it's gitignored, by design), so test-stage
+config is provided via an `env:` block in the workflow. These are
+**throwaway, test-only** credentials for an ephemeral Postgres container
+that never holds real data. For any *real* secret, I'd use **GitHub Actions
+Secrets** (encrypted, referenced as `${{ secrets.NAME }}`) rather than
+inline values — the same "each environment supplies secrets its own way"
+principle.
