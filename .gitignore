@@ -17,3 +17,4 @@ venv/
 .terraform.lock.hcl
 
 .pytest_cache/
+.ruff_cache/

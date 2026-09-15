@@ -66,3 +66,31 @@ The script pulls a specific tested image and runs the full stack via
 small always-on instance or a managed container service), store deploy
 credentials as GitHub Actions secrets, and add an automated deploy job
 gated behind the build step — making the whole push-to-live flow automatic.
+
+## Secrets & configuration approach
+
+Secrets are kept out of the repo and out of image layers at every stage:
+
+- **Local dev:** secrets live in a gitignored `.env` file; `docker-compose`
+  loads it automatically. A committed `.env.example` documents required
+  config with placeholder values only.
+- **Git:** `.gitignore` blocks `.env`, `*.tfstate`, and `*.tfstate.*`
+  (Terraform state can contain secrets in plain text).
+- **Docker images:** `.dockerignore` blocks `.env` so secrets can never be
+  baked into an image layer.
+- **CI/CD:** the pipeline authenticates to GHCR using GitHub's
+  auto-generated, short-lived `GITHUB_TOKEN` — no long-lived registry
+  credentials are stored anywhere. The job requests only `packages: write`
+  (least privilege).
+- **Cloud (Terraform):** AWS credentials are supplied via environment
+  variables in the shell session only — never written to any file.
+
+### What I'd do for production (with more time/budget)
+
+- Use a dedicated **secrets manager / vault** (e.g. AWS Secrets Manager or
+  HashiCorp Vault) so secrets are centrally managed, rotated, and audited
+  rather than living in `.env` files.
+- Inject secrets at runtime from the manager rather than via env files.
+- Apply least-privilege IAM roles for each component instead of broad
+  credentials.
+- Remove the fallback password default from compose entirely.
