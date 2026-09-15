@@ -37,11 +37,6 @@ deterministic fix is preferable when the flakiness is in your control.
   provider versions; ignored here since state is local/ephemeral. A
   judgment call.
 
-## Known gaps I have NOT yet fixed
-
-- Secrets: the Postgres password is currently in plain text in
-  docker-compose.yml (to be addressed in Task 4).
-
 ## Deployment approach (and the ephemeral-environment trade-off)
 
 The CI pipeline fully automates: lint → test (gating) → build image →
