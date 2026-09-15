@@ -8,8 +8,6 @@ __pycache__/
 venv/
 .venv/
 
-.dockerignore
-
 # Terraform
 .terraform/
 *.tfstate
@@ -18,3 +16,6 @@ venv/
 
 .pytest_cache/
 .ruff_cache/
+
+# Database backups — can contain real data, stay on the machine
+backups/

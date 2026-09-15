@@ -123,3 +123,20 @@ principle.
 - **With more time:** add Prometheus metrics (request rates/latencies via a
   /metrics endpoint) and Grafana alerting rules; ship the overlay to the
   deploy environment too.
+
+## Rollback approach (Task 6)
+
+- App rollback = redeploy a known-good SHA-tagged image with `deploy.sh`
+  (the same command as any deploy — demonstrated live, including on an
+  older tag, with health verification).
+- Data rollback = `backup.sh` / `restore.sh` (pg_dump using the db
+  container's own credentials — no secrets in scripts) plus a documented
+  disaster drill in ROLLBACK.md.
+- Trade-offs: rollback is manual/scripted, not automated; backups are
+  on-demand and live on the same host (RPO = time since the last backup).
+  With budget: automated health-gated rollback, blue-green deploys, and
+  scheduled off-host backups.
+- Also caught & fixed during Task 6: `.dockerignore` had been accidentally
+  gitignored, so it was missing from the repo (and from CI checkouts — CI
+  builds ran without it). No secret was exposed (the runner has no `.env`),
+  but the deliverable itself was broken. Now committed properly.

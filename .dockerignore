@@ -1,0 +1,20 @@
+.git
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+Dockerfile
+docker-compose.yml
+README.md
+hello.py
+.gitignore
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+.pytest_cache/
+.ruff_cache/
