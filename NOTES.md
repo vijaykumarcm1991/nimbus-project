@@ -99,3 +99,27 @@ that never holds real data. For any *real* secret, I'd use **GitHub Actions
 Secrets** (encrypted, referenced as `${{ secrets.NAME }}`) rather than
 inline values — the same "each environment supplies secrets its own way"
 principle.
+
+## Observability approach (Task 5)
+
+- **Healthchecks:** every service in docker-compose.yml defines a healthcheck
+  (app: hits its own /health, which checks Postgres + Redis; db: pg_isready;
+  cache: redis-cli ping), and the app waits on `condition: service_healthy`.
+- **Centralized logs:** a `docker-compose.observability.yml` overlay adds
+  Grafana + Loki. The Loki Docker logging-driver plugin ships each container's
+  stdout/stderr to Loki; logs are searched in Grafana Explore by labels
+  (compose_service, container_name).
+- **Why an overlay file, not the base compose:** CI runners don't have the
+  Loki driver plugin installed, so the base compose (which CI runs) must stay
+  plugin-free. Observability is opt-in locally:
+  `docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d`
+- **Debugging story worth telling:** the driver initially pushed to
+  `http://loki:3100` and silently failed — the driver runs inside the Docker
+  daemon, *not* in a container, so Compose's service-name DNS doesn't apply to
+  it. Fixed by pointing it at the host-published port
+  (`http://localhost:3100`). Grafana's own datasource test succeeded with the
+  service name because Grafana *is* a container on the Compose network —
+  same URL, two different network contexts.
+- **With more time:** add Prometheus metrics (request rates/latencies via a
+  /metrics endpoint) and Grafana alerting rules; ship the overlay to the
+  deploy environment too.
