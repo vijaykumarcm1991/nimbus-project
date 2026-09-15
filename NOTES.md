@@ -41,3 +41,28 @@ deterministic fix is preferable when the flakiness is in your control.
 
 - Secrets: the Postgres password is currently in plain text in
   docker-compose.yml (to be addressed in Task 4).
+
+## Deployment approach (and the ephemeral-environment trade-off)
+
+The CI pipeline fully automates: lint → test (gating) → build image →
+push to GHCR, tagged with the commit SHA and `latest`.
+
+The **deploy step is deliberately manual/scripted** rather than automated,
+because the staging environment (a KodeKloud AWS sandbox) is ephemeral —
+it resets every ~3 hours and issues fresh temporary credentials each
+session. There is no permanent host or stable long-lived credential to
+give the pipeline, so auto-deploy on every push isn't safe or meaningful
+here.
+
+Instead, deployment is a single scripted command run on-demand against a
+live environment:
+
+    ./deploy.sh ghcr.io/vijaykumarcm1991/nimbus-project:<tag>
+
+The script pulls a specific tested image and runs the full stack via
+`docker-compose.deploy.yml`, then verifies health before reporting success.
+
+**With more time/budget**, I'd provision a permanent staging host (e.g. a
+small always-on instance or a managed container service), store deploy
+credentials as GitHub Actions secrets, and add an automated deploy job
+gated behind the build step — making the whole push-to-live flow automatic.

@@ -1,0 +1,44 @@
+services:
+  app:
+    image: ${APP_IMAGE:-ghcr.io/vijaykumarcm1991/nimbus-project:latest}
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://nimbus:nimbus_pw@db:5432/nimbus_db
+      - REDIS_URL=redis://cache:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=nimbus
+      - POSTGRES_PASSWORD=nimbus_pw
+      - POSTGRES_DB=nimbus_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nimbus -d nimbus_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
